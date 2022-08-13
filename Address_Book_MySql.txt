@@ -223,360 +223,184 @@ mysql> SELECT state, COUNT(id) FROM address_book GROUP BY state;
 2 rows in set (0.00 sec)
 
 ************************************************************************************
-UC8: Ability to extend employee_payroll data to store employee information like employee phone, address
-and department
+UC8: Ability to retrieve entries sorted alphabetically by Person’s name for a given city
 
-mysql> ALTER TABLE employee_payroll ADD phone_number VARCHAR(250) AFTER name;
-Query OK, 0 rows affected (0.26 sec)
-Records: 0  Duplicates: 0  Warnings: 0
-
-mysql> ALTER TABLE employee_payroll ADD address VARCHAR(250) AFTER phone_number;
-Query OK, 0 rows affected (0.15 sec)
-Records: 0  Duplicates: 0  Warnings: 0
-
-mysql> ALTER TABLE employee_payroll ADD department VARCHAR(150) NOT NULL AFTER address;
-Query OK, 0 rows affected (0.06 sec)
-Records: 0  Duplicates: 0  Warnings: 0
-
-mysql> ALTER TABLE employee_payroll ALTER address SET DEFAULT 'TBD';
-Query OK, 0 rows affected (0.08 sec)
-Records: 0  Duplicates: 0  Warnings: 0
-
-mysql> describe employee_payroll;
-+--------------+--------------+------+-----+---------+----------------+
-| Field        | Type         | Null | Key | Default | Extra          |
-+--------------+--------------+------+-----+---------+----------------+
-| id           | int unsigned | NO   | PRI | NULL    | auto_increment |
-| name         | varchar(150) | NO   |     | NULL    |                |
-| phone_number | varchar(250) | YES  |     | NULL    |                |
-| address      | varchar(250) | YES  |     | TBD     |                |
-| department   | varchar(150) | NO   |     | NULL    |                |
-| gender       | char(1)      | YES  |     | NULL    |                |
-| salary       | double       | NO   |     | NULL    |                |
-| start        | date         | NO   |     | NULL    |                |
-+--------------+--------------+------+-----+---------+----------------+
-8 rows in set (0.00 sec)
-
-mysql> Select * from employee_payroll;
-+----+---------+--------------+---------+------------+--------+---------+------------+
-| id | name    | phone_number | address | department | gender | salary  | start      |
-+----+---------+--------------+---------+------------+--------+---------+------------+
-|  1 | Bill    | NULL         | NULL    |            | M      | 1000000 | 2018-01-03 |
-|  2 | Terisa  | NULL         | NULL    |            | F      | 3000000 | 2019-11-13 |
-|  3 | Charlie | NULL         | NULL    |            | M      | 3000000 | 2020-05-21 |
-+----+---------+--------------+---------+------------+--------+---------+------------+
-3 rows in set (0.00 sec)
+mysql> SELECT city from address_book ORDER BY city;
++--------+
+| city   |
++--------+
+| Jaipur |
+| Pune   |
++--------+
+2 rows in set (0.03 sec)
 
 mysql>
 
-************************************************************************************************************
+*******************************************************************************************************************************************************
 
-UC9: Ability to extend employee_payroll table to have Basic Pay, Deductions, Taxable Pay, Income Tax, Net Pay
+UC9: Ability to identify each Address Book with name and Type. 
 
-mysql> ALTER TABLE employee_payroll RENAME COLUMN salary TO basic_pay;
-Query OK, 0 rows affected (0.15 sec)
-Records: 0  Duplicates: 0  Warnings: 0
-
-mysql> ALTER TABLE employee_payroll ADD deductions Double NOT NULL AFTER basic_pay;
-Query OK, 0 rows affected (0.09 sec)
-Records: 0  Duplicates: 0  Warnings: 0
-
-mysql> ALTER TABLE employee_payroll ADD taxable_pay Double NOT NULL AFTER deductions;
-Query OK, 0 rows affected (0.07 sec)
-Records: 0  Duplicates: 0  Warnings: 0
-
-mysql> ALTER TABLE employee_payroll ADD tax Double NOT NULL AFTER taxable_pay;
-Query OK, 0 rows affected (0.06 sec)
-Records: 0  Duplicates: 0  Warnings: 0
-
-mysql> ALTER TABLE employee_payroll ADD net_pay Double NOT NULL AFTER tax;
-Query OK, 0 rows affected (0.07 sec)
-Records: 0  Duplicates: 0  Warnings: 0
-
-mysql> describe employee_payroll;
-+--------------+--------------+------+-----+---------+----------------+
-| Field        | Type         | Null | Key | Default | Extra          |
-+--------------+--------------+------+-----+---------+----------------+
-| id           | int unsigned | NO   | PRI | NULL    | auto_increment |
-| name         | varchar(150) | NO   |     | NULL    |                |
-| phone_number | varchar(250) | YES  |     | NULL    |                |
-| address      | varchar(250) | YES  |     | TBD     |                |
-| department   | varchar(150) | NO   |     | NULL    |                |
-| gender       | char(1)      | YES  |     | NULL    |                |
-| basic_pay    | double       | NO   |     | NULL    |                |
-| deductions   | double       | NO   |     | NULL    |                |
-| taxable_pay  | double       | NO   |     | NULL    |                |
-| tax          | double       | NO   |     | NULL    |                |
-| net_pay      | double       | NO   |     | NULL    |                |
-| start        | date         | NO   |     | NULL    |                |
-+--------------+--------------+------+-----+---------+----------------+
-12 rows in set (0.00 sec)
-
-mysql> Select * from employee_payroll;
-+----+---------+--------------+---------+------------+--------+-----------+------------+-------------+-----+---------+------------+
-| id | name    | phone_number | address | department | gender | basic_pay | deductions | taxable_pay | tax | net_pay | start      |
-+----+---------+--------------+---------+------------+--------+-----------+------------+-------------+-----+---------+------------+
-|  1 | Bill    | NULL         | NULL    |            | M      |   1000000 |          0 |           0 |   0 |       0 | 2018-01-03 |
-|  2 | Terisa  | NULL         | NULL    |            | F      |   3000000 |          0 |           0 |   0 |       0 | 2019-11-13 |
-|  3 | Charlie | NULL         | NULL    |            | M      |   3000000 |          0 |           0 |   0 |       0 | 2020-05-21 |
-+----+---------+--------------+---------+------------+--------+-----------+------------+-------------+-----+---------+------------+
-3 rows in set (0.00 sec)
-
-mysql>
-
-**********************************************************************************************************************************
-
-UC11: Implement the ER Diagram into Payroll Service DB
-
-
-#company table
-
-mysql> CREATE TABLE company                                                                                                                                       
-    -> (
-    -> company_id            INT unsigned NOT NULL AUTO_INCREMENT,
-    -> company_name          VARCHAR(150) NOT NULL,
-    -> PRIMARY KEY           (company_id)
-    -> );
-Query OK, 0 rows affected (0.60 sec)
-
-mysql> DESCRIBE company;
-+--------------+--------------+------+-----+---------+----------------+
-| Field        | Type         | Null | Key | Default | Extra          |
-+--------------+--------------+------+-----+---------+----------------+
-| company_id   | int unsigned | NO   | PRI | NULL    | auto_increment |
-| company_name | varchar(150) | NO   |     | NULL    |                |
-+--------------+--------------+------+-----+---------+----------------+
-2 rows in set (0.01 sec)
-
-mysql> INSERT INTO company (company_name) VALUES
-    -> ( 'Infosis'),
-    -> ('Infosis'),
-    -> ('Infosis');
-Query OK, 3 rows affected (0.13 sec)
-Records: 3  Duplicates: 0  Warnings: 0
-
-mysql> DESCRIBE company;
-+--------------+--------------+------+-----+---------+----------------+
-| Field        | Type         | Null | Key | Default | Extra          |
-+--------------+--------------+------+-----+---------+----------------+
-| company_id   | int unsigned | NO   | PRI | NULL    | auto_increment |
-| company_name | varchar(150) | NO   |     | NULL    |                |
-+--------------+--------------+------+-----+---------+----------------+
+mysql> SELECT * FROM address_book;
++----+---------+------+---------+--------+-------------+--------+---------+---------------+
+| id | name    | type | address | city   | state       | zip    | phone   | email         |
++----+---------+------+---------+--------+-------------+--------+---------+---------------+
+|  1 | Srushti |      | Dapodi  | Pune   | Maharashtra | 421563 | 7256891 | abc@gmail.com |
+|  2 | Rasika  |      | Aundh   | Jaipur | Rajasthan   | 564456 | 7894561 | xyz@gmail.com |
++----+---------+------+---------+--------+-------------+--------+---------+---------------+
 2 rows in set (0.00 sec)
 
-mysql> SELECT * FROM company;
-+------------+--------------+
-| company_id | company_name |
-+------------+--------------+
-|          1 | Infosis      |
-|          2 | Infosis      |
-|          3 | Infosis      |
-+------------+--------------+
+mysql> update address_book set type = 'Friend' where name = 'Srushti';
+Query OK, 1 row affected (0.07 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> update address_book set type = 'Profession' where name = 'Rasika';
+Query OK, 1 row affected (0.06 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT * FROM address_book;
++----+---------+------------+---------+--------+-------------+--------+---------+---------------+
+| id | name    | type       | address | city   | state       | zip    | phone   | email         |
++----+---------+------------+---------+--------+-------------+--------+---------+---------------+
+|  1 | Srushti | Friend     | Dapodi  | Pune   | Maharashtra | 421563 | 7256891 | abc@gmail.com |
+|  2 | Rasika  | Profession | Aundh   | Jaipur | Rajasthan   | 564456 | 7894561 | xyz@gmail.com |
++----+---------+------------+---------+--------+-------------+--------+---------+---------------+
+2 rows in set (0.00 sec)
+
+
+mysql> SELECT * FROM address_book;
++----+---------+------------+---------+--------+-------------+--------+----------+---------------+
+| id | name    | type       | address | city   | state       | zip    | phone    | email         |
++----+---------+------------+---------+--------+-------------+--------+----------+---------------+
+|  1 | Srushti | Friend     | Dapodi  | Pune   | Maharashtra | 421563 |  7256891 | abc@gmail.com |
+|  2 | Rasika  | Profession | Aundh   | Jaipur | Rajasthan   | 564456 |  7894561 | xyz@gmail.com |
+|  4 | Ruchika | Family     | Khadki  | Surat  | Gujrat      | 256478 | 25487698 | oqr@gmail.com |
++----+---------+------------+---------+--------+-------------+--------+----------+---------------+
 3 rows in set (0.00 sec)
 
+mysql>
 
-# employee table
+*******************************************************************************************************************************************************
 
-mysql> CREATE TABLE employee
+UC10: Ability to get number of contact persons i.e. count by type
+
+mysql> SELECT phone FROM address_book WHERE name = 'Ruchika';
++----------+
+| phone    |
++----------+
+| 25487698 |
++----------+
+1 row in set (0.00 sec)
+
+mysql>
+
+**********************************************************************************************************************************************************
+
+I] CREATE TABLE friend
+
+mysql> CREATE TABLE friend
     -> (
-    -> id               INT unsigned NOT NULL AUTO_INCREMENT,
-    -> company_id       INT unsigned NOT NULL,
-    -> name             VARCHAR(150) NOT NULL,
-    -> phone_number     Double NOT NULL,
-    -> address             VARCHAR(300) NOT NULL,
-    -> gender          CHAR(1) NOT NULL,
-    -> start           DATE NOT NULL,
-    -> PRIMARY KEY     (id)
+    -> id INT unsigned NOT NULL AUTO_INCREMENT,
+    -> name   VARCHAR(150) NOT NULL,
+    -> phone  INT(10) NOT NULL,
+    -> email VARCHAR(250) NOT NULL,
+    -> PRIMARY KEY(id)
     -> );
-Query OK, 0 rows affected (0.21 sec)
+Query OK, 0 rows affected, 1 warning (0.23 sec)
 
-mysql> DESCRIBE employee;
-+--------------+--------------+------+-----+---------+----------------+
-| Field        | Type         | Null | Key | Default | Extra          |
-+--------------+--------------+------+-----+---------+----------------+
-| id           | int unsigned | NO   | PRI | NULL    | auto_increment |
-| company_id   | int unsigned | NO   |     | NULL    |                |
-| name         | varchar(150) | NO   |     | NULL    |                |
-| phone_number | double       | NO   |     | NULL    |                |
-| address      | varchar(300) | NO   |     | NULL    |                |
-| gender       | char(1)      | NO   |     | NULL    |                |
-| start        | date         | NO   |     | NULL    |                |
-+--------------+--------------+------+-----+---------+----------------+
-7 rows in set (0.00 sec)
-
-mysql> INSERT INTO employee (company_id, name, phone_number, address, gender, start) VALUES
-    -> ('111', 'Bill', '5346875648', 'new street new delhi', 'M', '2018-01-03'),
-    -> ('111', 'Terisa', '4526845263', 'old street pune', 'F', '2019-11-03');
-Query OK, 2 rows affected (0.09 sec)
-Records: 2  Duplicates: 0  Warnings: 0
-
-mysql> INSERT INTO employee (company_id, name, phone_number, address, gender, start) VALUES
-    -> ('111', 'Charlie', '9658423567', 'gandhi nagar mumbai', 'M', '2020-05-21');
-Query OK, 1 row affected (0.04 sec)
-
-mysql> SELECT * FROM employee;
-+----+------------+---------+--------------+----------------------+--------+------------+
-| id | company_id | name    | phone_number | address              | gender | start      |
-+----+------------+---------+--------------+----------------------+--------+------------+
-|  1 |        111 | Bill    |   5346875648 | new street new delhi | M      | 2018-01-03 |
-|  2 |        111 | Terisa  |   4526845263 | old street pune      | F      | 2019-11-03 |
-|  3 |        111 | Charlie |   9658423567 | gandhi nagar mumbai  | M      | 2020-05-21 |
-+----+------------+---------+--------------+----------------------+--------+------------+
+mysql> SELECT * FROM address_book;
++----+---------+------------+---------+--------+-------------+--------+----------+---------------+
+| id | name    | type       | address | city   | state       | zip    | phone    | email         |
++----+---------+------------+---------+--------+-------------+--------+----------+---------------+
+|  1 | Srushti | Friend     | Dapodi  | Pune   | Maharashtra | 421563 |  7256891 | abc@gmail.com |
+|  2 | Rasika  | Profession | Aundh   | Jaipur | Rajasthan   | 564456 |  7894561 | xyz@gmail.com |
+|  4 | Ruchika | Family     | Khadki  | Surat  | Gujrat      | 256478 | 25487698 | oqr@gmail.com |
++----+---------+------------+---------+--------+-------------+--------+----------+---------------+
 3 rows in set (0.00 sec)
+mysql> INSERT INTO friend (name, phone, email) VALUES
+    -> ( 'Srushti', '7256891', 'abc@gmail.com');
+Query OK, 1 row affected (0.07 sec)
 
-# department table
-mysql> CREATE TABLE department
+mysql> SELECT * FROM friend;
++----+---------+---------+---------------+
+| id | name    | phone   | email         |
++----+---------+---------+---------------+
+|  1 | Srushti | 7256891 | abc@gmail.com |
++----+---------+---------+---------------+
+1 row in set (0.00 sec)
+
+mysql>
+
+II] CREATE TABLE FAMILY
+mysql> CREATE TABLE family
     -> (
     -> id             INT unsigned NOT NULL AUTO_INCREMENT,
     -> name           VARCHAR(150) NOT NULL,
-    -> department     VARCHAR(50) NOT NULL,
-    -> PRIMARY KEY    (id)
+    -> phone          INT(10) NOT NULL,
+    -> email          VARCHAR(250) NOT NULL,
+    -> PRIMARY KEY(id)
     -> );
-Query OK, 0 rows affected (0.18 sec)
+Query OK, 0 rows affected, 1 warning (0.75 sec)
 
-mysql> INSERT INTO department (name, department) VALUES
-    -> ('Bill', 'Sales'),
-    -> ('Terisa', 'Sales'),
-    -> ('Charlie', 'Sales'),
-    -> ('Terisa', 'Marketing');
-Query OK, 4 rows affected (0.12 sec)
-Records: 4  Duplicates: 0  Warnings: 0
+mysql> INSERT INTO family (name, phone, email) VALUES
+    -> ('Srushti', '256348', 'abc@gmail.com'),
+    -> ('Ruchika', '153462', 'hjk@gmail.com');
+Query OK, 2 rows affected (0.08 sec)
+Records: 2  Duplicates: 0  Warnings: 0
 
-mysql> SELECT * FROM department;
-+----+---------+------------+
-| id | name    | department |
-+----+---------+------------+
-|  1 | Bill    | Sales      |
-|  2 | Terisa  | Sales      |
-|  3 | Charlie | Sales      |
-|  4 | Terisa  | Marketing  |
-+----+---------+------------+
-4 rows in set (0.00 sec)
-
-#payroll table
-mysql> CREATE TABLE payroll
-    -> (
-    -> id            INT unsigned NOT NULL AUTO_INCREMENT,
-    -> name          VARCHAR(150) NOT NULL,
-    -> basic_pay     Double NOT NULL,
-    -> deductions    Double NOT NULL,
-    -> taxable_pay   Double NOT NULL,
-    -> tax           Double NOT NULL,
-    -> net_pay       Double NOT NULL,
-    -> PRIMARY KEY   (id)
-    -> );
-Query OK, 0 rows affected (0.16 sec)
-
-mysql> INSERT INTO payroll (name, basic_pay, deductions, taxable_pay, tax, net_pay) VALUES
-    -> ('Bill', '1000000', '100000', '100000', '100000', '6000000'),
-    -> ('Terisa','2000000', '200000', '100000', '200000', '13000000'),
-    -> ('Charlie', '3000000', '300000', '200000', '100000', '22000000');
-Query OK, 3 rows affected (0.06 sec)
-Records: 3  Duplicates: 0  Warnings: 0
-
-mysql> SELECT * FROM payroll;
-+----+---------+-----------+------------+-------------+--------+----------+
-| id | name    | basic_pay | deductions | taxable_pay | tax    | net_pay  |
-+----+---------+-----------+------------+-------------+--------+----------+
-|  1 | Bill    |   1000000 |     100000 |      100000 | 100000 |  6000000 |
-|  2 | Terisa  |   2000000 |     200000 |      100000 | 200000 | 13000000 |
-|  3 | Charlie |   3000000 |     300000 |      200000 | 100000 | 22000000 |
-+----+---------+-----------+------------+-------------+--------+----------+
-3 rows in set (0.00 sec)
-
-mysql>
-
-************************************************************************************************************
-
-UC12:UC4  i] Ability to retrieve all the employee payroll data that is added to payroll service database
-
-mysql> SELECT * FROM payroll;
-+----+---------+-----------+------------+-------------+--------+----------+
-| id | name    | basic_pay | deductions | taxable_pay | tax    | net_pay  |
-+----+---------+-----------+------------+-------------+--------+----------+
-|  1 | Bill    |   1000000 |     100000 |      100000 | 100000 |  6000000 |
-|  2 | Terisa  |   2000000 |     200000 |      100000 | 200000 | 13000000 |
-|  3 | Charlie |   3000000 |     300000 |      200000 | 100000 | 22000000 |
-+----+---------+-----------+------------+-------------+--------+----------+
-3 rows in set (0.00 sec)
-
-mysql> SELECT * FROM company;
-+------------+--------------+
-| company_id | company_name |
-+------------+--------------+
-|          1 | Infosis      |
-|          2 | Infosis      |
-|          3 | Infosis      |
-+------------+--------------+
-3 rows in set (0.00 sec)
-
-mysql> SELECT * FROM Employee;
-+----+------------+---------+--------------+----------------------+--------+------------+
-| id | company_id | name    | phone_number | address              | gender | start      |
-+----+------------+---------+--------------+----------------------+--------+------------+
-|  1 |        111 | Bill    |   5346875648 | new street new delhi | M      | 2018-01-03 |
-|  2 |        111 | Terisa  |   4526845263 | old street pune      | F      | 2019-11-03 |
-|  3 |        111 | Charlie |   9658423567 | gandhi nagar mumbai  | M      | 2020-05-21 |
-+----+------------+---------+--------------+----------------------+--------+------------+
-3 rows in set (0.00 sec)
-
-mysql> SELECT * FROM payroll;
-+----+---------+-----------+------------+-------------+--------+----------+
-| id | name    | basic_pay | deductions | taxable_pay | tax    | net_pay  |
-+----+---------+-----------+------------+-------------+--------+----------+
-|  1 | Bill    |   1000000 |     100000 |      100000 | 100000 |  6000000 |
-|  2 | Terisa  |   2000000 |     200000 |      100000 | 200000 | 13000000 |
-|  3 | Charlie |   3000000 |     300000 |      200000 | 100000 | 22000000 |
-+----+---------+-----------+------------+-------------+--------+----------+
-3 rows in set (0.00 sec)
-
-mysql> SELECT * FROM department;
-+----+---------+------------+
-| id | name    | department |
-+----+---------+------------+
-|  1 | Bill    | Sales      |
-|  2 | Terisa  | Sales      |
-|  3 | Charlie | Sales      |
-|  4 | Terisa  | Marketing  |
-+----+---------+------------+
-4 rows in set (0.00 sec)
-
-mysql>
-
-
-UC12:UC5   II] Ability to retrieve salary data for a particular employee as well as all employees who have joined in a particular data range from the payroll service database
-
-mysql> SELECT address FROM employee WHERE name = 'Bill';
-+----------------------+
-| address              |
-+----------------------+
-| new street new delhi |
-+----------------------+
-1 row in set (0.03 sec)
-
-mysql> SELECT basic_pay FROM payroll WHERE name = 'Terisa';
-+-----------+
-| basic_pay |
-+-----------+
-|   2000000 |
-+-----------+
-1 row in set (0.00 sec)
-
-mysql> SELECT department FROM department WHERE name = 'Terisa';
-+------------+
-| department |
-+------------+
-| Sales      |
-| Marketing  |
-+------------+
+mysql> SELECT * FROM family
+    -> ;
++----+---------+--------+---------------+
+| id | name    | phone  | email         |
++----+---------+--------+---------------+
+|  1 | Srushti | 256348 | abc@gmail.com |
+|  2 | Ruchika | 153462 | hjk@gmail.com |
++----+---------+--------+---------------+
 2 rows in set (0.00 sec)
 
-mysql> SELECT taxable_pay FROM payroll WHERE name = 'Charlie';
-+-------------+
-| taxable_pay |
-+-------------+
-|      200000 |
-+-------------+
+mysql>
+
+III] CREATE TABLE PROFESSION
+
+mysql> CREATE TABLE profession
+    -> (
+    -> id INT unsigned NOT NULL AUTO_INCREMENT,
+    -> name   VARCHAR(150) NOT NULL,
+    -> address  VARCHAR(250) NOT NULL,
+    -> city     VARCHAR(50) NOT NULL,
+    -> state    VARCHAR(50) NOT NULL,
+    -> zip      INT(10) NOT NULL,
+    -> phone    INT(10) NOT NULL,
+    -> email    VARCHAR(30) NOT NULL,
+    -> PRIMARY KEY  (id)
+    -> );
+Query OK, 0 rows affected, 2 warnings (0.20 sec)
+
+mysql> INSERT INTO profession (name, address, city, state, zip, phone, email) VALUES
+    -> ( 'Rasika', 'Aundh', 'Jaipur', 'Rajasthan', '452374', '234578968', 'xyz@gmail.com' );
+Query OK, 1 row affected (0.07 sec)
+
+mysql> SELECT * FROM profession;
++----+--------+---------+--------+-----------+--------+-----------+---------------+
+| id | name   | address | city   | state     | zip    | phone     | email         |
++----+--------+---------+--------+-----------+--------+-----------+---------------+
+|  1 | Rasika | Aundh   | Jaipur | Rajasthan | 452374 | 234578968 | xyz@gmail.com |
++----+--------+---------+--------+-----------+--------+-----------+---------------+
+1 row in set (0.00 sec)
+
+mysql>
+
+*********************************************************************************************************************************************
+
+UC12:  
+
+I]  Ability to Retrieve Person belonging to a City or State from  the Address Book
+
+mysql> SELECT city FROM profession WHERE name = 'Rasika';
++--------+
+| city   |
++--------+
+| Jaipur |
++--------+
 1 row in set (0.00 sec)
 
 mysql>
